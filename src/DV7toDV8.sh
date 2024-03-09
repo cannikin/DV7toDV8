@@ -1,19 +1,5 @@
 #!/bin/bash
 
-# Only needed when relying on a local install of mkvtoolnix
-# which mkvmerge >/dev/null
-# if [[ $? == 1 ]]
-# then
-#     echo "Run 'brew install mkvtoolnix' to install mkvmerge"
-#     exit 1
-# fi
-# which mkvextract >/dev/null
-# if [[ $? == 1 ]]
-# then
-#     echo "Run 'brew install mkvtoolnix' to install mkvextract"
-#     exit 1
-# fi
-
 # Keep working files generated during processing
 keepFiles=false
 # Replace files in place
@@ -22,15 +8,6 @@ moveFiles=false
 while true
 do
     case "$1" in
-    --keep-files)
-        echo "Option enabled to keep working files"
-        keepFiles=true
-        shift;;
-    "")
-        break;;
-    *)
-        targetDir=$1
-        shift;;
         --keep-files)
             echo "Option enabled to keep working files"
             keepFiles=true
