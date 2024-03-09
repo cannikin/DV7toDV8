@@ -58,7 +58,21 @@ do
     DV8_BL_RPU_HEVC=$mkvBase.DV8.BL_RPU.hevc
     DV8_RPU_BIN=$mkvBase.DV8.RPU.bin
 
-    echo "Demuxing BL+EL+RPU HEVC from MKV..."
+    printf "\nProcessing file: '$mkvBase.mkv'...\n"
+
+    # only work on files containing Profile 7 DV
+    printf "  Checking file for Dolby Vision Profile 7..."
+    PROFILE_CHECK=$("$mediaInfoPath" "$mkvFile" | grep "Profile 7")
+
+    if [[ $PROFILE_CHECK == "" ]]
+    then
+        printf "skipping."
+        continue
+    else
+        printf "found, processing\n"
+    fi
+
+    echo "  Demuxing BL+EL+RPU HEVC from MKV..."
     "$mkvextractPath" "$mkvFile" tracks 0:"$BL_EL_RPU_HEVC"
 
     if [[ $? != 0 ]] || [[ ! -f "$BL_EL_RPU_HEVC" ]]
