@@ -16,6 +16,8 @@
 
 # Keep working files generated during processing
 keepFiles=false
+# Replace files in place
+moveFiles=false
 
 while true
 do
@@ -29,6 +31,19 @@ do
     *)
         targetDir=$1
         shift;;
+        --keep-files)
+            echo "Option enabled to keep working files"
+            keepFiles=true
+            shift;;
+        --move)
+            echo "Option enabled to move files to /Volumes/Video/Movies"
+            moveFiles=true
+            shift;;
+        "")
+            break;;
+        *)
+            targetDir=$1
+            shift;;
     esac
 done
 
@@ -129,6 +144,34 @@ do
         rm "$DV8_RPU_BIN" 
         rm "$DV8_BL_RPU_HEVC"
     fi
+
+
+    # Moves files from wherever they were processed to /Volumes/Video/Movies
+    # Run this version in the future when we rip movies with MakeMKV so that
+    # we process them before moving them to Movies
+    if [[ $moveFiles ]]
+    then
+        echo "  Moving EL to /Volumes/Video/DV7 Enhancement Layers..."
+        pv < "$mkvBase.DV8.L1_plot.png" > "/Volumes/Video/DV7 Enhancement Layers/$mkvBase.DV8.L1_plot.png"
+        rm "$mkvBase.DV8.L1_plot.png"
+        pv < "$DV7_EL_RPU_HEVC" > "/Volumes/Video/DV7 Enhancement Layers/$DV7_EL_RPU_HEVC"
+        rm "$DV7_EL_RPU_HEVC"
+        echo "  Replacing original MKV..."
+        pv < "$mkvFile" > "/Volumes/Video/Movies/$mkvBase.mkv"
+        rm "$mkvFile"
+    else
+        # Replaces files assuming we processed them directly in /Volumes/Video/Movies
+        # Run this version to convert the existing Movies directory completely
+        echo "  Moving EL to /Volumes/Video/DV7 Enhancement Layers..."
+        mv "$mkvBase.DV8.L1_plot.png" "../DV7 Enhancement Layers"
+        mv "$DV7_EL_RPU_HEVC" "../DV7 Enhancement Layers"
+        echo "  Replacing original MKV..."
+        mv "$mkvBase.mkv" "$mkvBase.mkv.bak"
+        mv "$mkvBase.DV8.mkv" "$mkvBase.mkv"
+        rm "$mkvBase".mkv.bak
+    fi
+
+    echo "  Done with ${mkvBase}.mkv"
 done
 
 popd > /dev/null
