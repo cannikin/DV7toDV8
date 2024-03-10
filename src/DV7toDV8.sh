@@ -142,8 +142,8 @@ do
         pv < "$DV7_EL_RPU_HEVC" > "/Volumes/Video/DV7 Enhancement Layers/$DV7_EL_RPU_HEVC"
         rm "$DV7_EL_RPU_HEVC"
         echo "  Replacing original MKV..."
-        pv < "$mkvFile" > "/Volumes/Video/Movies/$mkvBase.mkv"
-        rm "$mkvFile"
+        pv < "$mkvBase.DV8.mkv" > "/Volumes/Video/Movies/$mkvBase.mkv"
+        rm "$mkvBase.DV8.mkv"
     else
         # Replaces files assuming we processed them directly in /Volumes/Video/Movies
         # Run this version to convert the existing Movies directory completely
