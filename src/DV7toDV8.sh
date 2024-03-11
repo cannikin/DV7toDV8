@@ -24,6 +24,9 @@ do
     esac
 done
 
+echo "keepFiles: $keepFiles"
+echo "moveFiles: $moveFiles"
+
 if [[ ! -d $targetDir ]]
 then
     echo "Directory not found: '$targetDir'"
@@ -130,30 +133,28 @@ do
         rm "$DV8_BL_RPU_HEVC"
     fi
 
-
-    # Moves files from wherever they were processed to /Volumes/Video/Movies
-    # Run this version in the future when we rip movies with MakeMKV so that
-    # we process them before moving them to Movies
-    if [[ $moveFiles ]]
+    if [[ $moveFiles == true ]]
     then
+        # Moves files to /Volumes/Video/Movies when done processing
         echo "  Moving EL to /Volumes/Video/DV7 Enhancement Layers..."
-        pv < "$mkvBase.DV8.L1_plot.png" > "/Volumes/Video/DV7 Enhancement Layers/$mkvBase.DV8.L1_plot.png"
-        rm "$mkvBase.DV8.L1_plot.png"
-        pv < "$DV7_EL_RPU_HEVC" > "/Volumes/Video/DV7 Enhancement Layers/$DV7_EL_RPU_HEVC"
-        rm "$DV7_EL_RPU_HEVC"
-        echo "  Replacing original MKV..."
-        pv < "$mkvBase.DV8.mkv" > "/Volumes/Video/Movies/$mkvBase.mkv"
-        rm "$mkvBase.DV8.mkv"
+        pv < "$mkvBase.DV8.L1_plot.png" > "/Volumes/Video/DV7 Enhancement Layers/$mkvBase.DV8.L1_plot.png" && rm "$mkvBase.DV8.L1_plot.png"
+        pv < "$DV7_EL_RPU_HEVC" > "/Volumes/Video/DV7 Enhancement Layers/$DV7_EL_RPU_HEVC" && rm "$DV7_EL_RPU_HEVC"
+        echo "  Moving MKV to /Volumes/Video/Movies..."
+        # copy up to Movies
+        pv < "$mkvBase.DV8.mkv" > "/Volumes/Video/Movies/$mkvBase.DV8.mkv" && \
+          rm "/Volumes/Video/Movies/$mkvBase.mkv" && \
+          mv "/Volumes/Video/Movies/$mkvBase.DV8.mkv" "/Volumes/Video/Movies/$mkvBase.mkv" && \
+          rm "$mkvBase.DV8.mkv" && \
+          rm "$mkvBase.mkv"
     else
-        # Replaces files assuming we processed them directly in /Volumes/Video/Movies
-        # Run this version to convert the existing Movies directory completely
-        echo "  Moving EL to /Volumes/Video/DV7 Enhancement Layers..."
+        # Replaces files in place
+        echo "  Moving EL to ../DV7 Enhancement Layers..."
         mv "$mkvBase.DV8.L1_plot.png" "../DV7 Enhancement Layers"
         mv "$DV7_EL_RPU_HEVC" "../DV7 Enhancement Layers"
-        echo "  Replacing original MKV..."
-        mv "$mkvBase.mkv" "$mkvBase.mkv.bak"
-        mv "$mkvBase.DV8.mkv" "$mkvBase.mkv"
-        rm "$mkvBase".mkv.bak
+        echo "  Replacing original MKV in place..."
+        mv "$mkvBase.mkv" "$mkvBase.mkv.bak" && \
+          mv "$mkvBase.DV8.mkv" "$mkvBase.mkv" && \
+          rm "$mkvBase".mkv.bak
     fi
 
     echo "  Done with ${mkvBase}.mkv"
